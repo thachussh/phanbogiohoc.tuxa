@@ -33,7 +33,7 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        .error, .suggestion, .limit-error {
+        .error, .suggestion {
             color: red;
             font-weight: bold;
         }
@@ -72,13 +72,12 @@
             <input type="number" id="theory-credits" min="0" value="0">
         </div>
         <div class="input-group">
-            <label for="practice-credits">Số tín chỉ thực hành:</label>
+            <label for="practice-credits">Số tín chỉ thực hành/thí nghiệm/thảo luận:</label>
             <input type="number" id="practice-credits" min="0" value="0">
         </div>
         <p><strong>Tổng số tín chỉ:</strong> <span id="total-credits">0</span></p>
         <p><strong>Tự học (tiết):</strong> <span id="self-study-periods">0</span></p>
         <p id="error-message" class="error" style="display: none;">Lỗi: Tổng tín chỉ không khớp!</p>
-        <p id="limit-error-message" class="limit-error" style="display: none;">Lỗi: Tổng số tiết vượt quá giới hạn! <span id="limit-details"></span></p>
         <p id="suggestion-message" class="suggestion" style="display: none;">Gợi ý: Cần thêm <span id="hours-needed">0</span> giờ để đạt tổng <span id="hours-required">0</span> giờ học tập.</p>
     </div>
 
@@ -89,28 +88,35 @@
                 <tr>
                     <th>Phân bổ các loại giờ</th>
                     <th>Lý thuyết (tiết)</th>
-                    <th>Thực hành (tiết)</th>
+                    <th>Thực hành/Thí nghiệm/Thảo luận (tiết)</th>
                     <th>Tự học, tự nghiên cứu (tiết)</th>
                     <th>Tổng (giờ)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="5"><strong>Số giờ giảng dạy, học tập</strong></td>
+                    <td colspan="5"><strong>Số giờ giảng dạy trực diện, trực tuyến</strong></td>
                 </tr>
                 <tr>
-                    <td>Trực tuyến đồng bộ</td>
-                    <td><input type="number" id="theory-sync" min="0" value="0"></td>
-                    <td><input type="number" id="practice-sync" min="0" value="0"></td>
-                    <td><input type="number" id="self-study-sync" min="0" value="0"></td>
-                    <td id="total-sync">0</td>
+                    <td>Trực diện (tại phòng học)</td>
+                    <td><input type="number" id="theory-classroom" min="0" value="0"></td>
+                    <td><input type="number" id="practice-classroom" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-classroom" min="0" value="0"></td>
+                    <td id="total-classroom">0</td>
                 </tr>
                 <tr>
-                    <td>Trực tuyến không đồng bộ</td>
-                    <td><input type="number" id="theory-async" min="0" value="0"></td>
-                    <td><input type="number" id="practice-async" min="0" value="0"></td>
-                    <td><input type="number" id="self-study-async" min="0" value="0"></td>
-                    <td id="total-async">0</td>
+                    <td>Trực tuyến (đồng bộ hoặc không đồng bộ)</td>
+                    <td><input type="number" id="theory-online" min="0" value="0"></td>
+                    <td><input type="number" id="practice-online" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-online" min="0" value="0"></td>
+                    <td id="total-online">0</td>
+                </tr>
+                <tr>
+                    <td>Đi thực tế, trải nghiệm</td>
+                    <td><input type="number" id="theory-field" min="0" value="0"></td>
+                    <td><input type="number" id="practice-field" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-field" min="0" value="0"></td>
+                    <td id="total-field">0</td>
                 </tr>
                 <tr>
                     <td>LMS (có hướng dẫn)</td>
@@ -120,14 +126,7 @@
                     <td id="total-lms">0</td>
                 </tr>
                 <tr>
-                    <td>Thư tín, học liệu (nếu có)</td>
-                    <td><input type="number" id="theory-correspondence" min="0" value="0"></td>
-                    <td><input type="number" id="practice-correspondence" min="0" value="0"></td>
-                    <td><input type="number" id="self-study-correspondence" min="0" value="0"></td>
-                    <td id="total-correspondence">0</td>
-                </tr>
-                <tr>
-                    <td><strong>Tổng Số giờ giảng dạy, học tập</strong></td>
+                    <td><strong>Tổng Số giờ giảng dạy trực diện, trực tuyến</strong></td>
                     <td id="total-theory-teaching">0</td>
                     <td id="total-practice-teaching">0</td>
                     <td id="total-self-study-teaching">0</td>
@@ -142,6 +141,20 @@
                     <td><input type="number" id="practice-self-study" min="0" value="0"></td>
                     <td><input type="number" id="self-study-research" min="0" value="0"></td>
                     <td id="total-self-study">0</td>
+                </tr>
+                <tr>
+                    <td>Làm việc nhóm</td>
+                    <td><input type="number" id="theory-group" min="0" value="0"></td>
+                    <td><input type="number" id="practice-group" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-group" min="0" value="0"></td>
+                    <td id="total-group">0</td>
+                </tr>
+                <tr>
+                    <td>Hoạt động học tập trên LMS</td>
+                    <td><input type="number" id="theory-lms-activity" min="0" value="0"></td>
+                    <td><input type="number" id="practice-lms-activity" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-lms-activity" min="0" value="0"></td>
+                    <td id="total-lms-activity">0</td>
                 </tr>
                 <tr>
                     <td>Ôn thi, dự thi, kiểm tra</td>
@@ -179,37 +192,43 @@
         const totalCreditsSpan = document.getElementById('total-credits');
         const selfStudyPeriodsSpan = document.getElementById('self-study-periods');
         const errorMessage = document.getElementById('error-message');
-        const limitErrorMessage = document.getElementById('limit-error-message');
-        const limitDetailsSpan = document.getElementById('limit-details');
         const suggestionMessage = document.getElementById('suggestion-message');
         const hoursNeededSpan = document.getElementById('hours-needed');
         const hoursRequiredSpan = document.getElementById('hours-required');
         const tableInputs = {
-            theorySync: document.getElementById('theory-sync'),
-            practiceSync: document.getElementById('practice-sync'),
-            selfStudySync: document.getElementById('self-study-sync'),
-            theoryAsync: document.getElementById('theory-async'),
-            practiceAsync: document.getElementById('practice-async'),
-            selfStudyAsync: document.getElementById('self-study-async'),
+            theoryClassroom: document.getElementById('theory-classroom'),
+            practiceClassroom: document.getElementById('practice-classroom'),
+            selfStudyClassroom: document.getElementById('self-study-classroom'),
+            theoryOnline: document.getElementById('theory-online'),
+            practiceOnline: document.getElementById('practice-online'),
+            selfStudyOnline: document.getElementById('self-study-online'),
+            theoryField: document.getElementById('theory-field'),
+            practiceField: document.getElementById('practice-field'),
+            selfStudyField: document.getElementById('self-study-field'),
             theoryLms: document.getElementById('theory-lms'),
             practiceLms: document.getElementById('practice-lms'),
             selfStudyLms: document.getElementById('self-study-lms'),
-            theoryCorrespondence: document.getElementById('theory-correspondence'),
-            practiceCorrespondence: document.getElementById('practice-correspondence'),
-            selfStudyCorrespondence: document.getElementById('self-study-correspondence'),
             theorySelfStudy: document.getElementById('theory-self-study'),
             practiceSelfStudy: document.getElementById('practice-self-study'),
             selfStudyResearch: document.getElementById('self-study-research'),
+            theoryGroup: document.getElementById('theory-group'),
+            practiceGroup: document.getElementById('practice-group'),
+            selfStudyGroup: document.getElementById('self-study-group'),
+            theoryLmsActivity: document.getElementById('theory-lms-activity'),
+            practiceLmsActivity: document.getElementById('practice-lms-activity'),
+            selfStudyLmsActivity: document.getElementById('self-study-lms-activity'),
             theoryAssessment: document.getElementById('theory-assessment'),
             practiceAssessment: document.getElementById('practice-assessment'),
             selfStudyAssessment: document.getElementById('self-study-assessment')
         };
         const tableCells = {
-            totalSync: document.getElementById('total-sync'),
-            totalAsync: document.getElementById('total-async'),
+            totalClassroom: document.getElementById('total-classroom'),
+            totalOnline: document.getElementById('total-online'),
+            totalField: document.getElementById('total-field'),
             totalLms: document.getElementById('total-lms'),
-            totalCorrespondence: document.getElementById('total-correspondence'),
             totalSelfStudy: document.getElementById('total-self-study'),
+            totalGroup: document.getElementById('total-group'),
+            totalLmsActivity: document.getElementById('total-lms-activity'),
             totalAssessment: document.getElementById('total-assessment'),
             totalTheoryTeaching: document.getElementById('total-theory-teaching'),
             totalPracticeTeaching: document.getElementById('total-practice-teaching'),
@@ -224,31 +243,6 @@
             totalSelfStudy: document.getElementById('total-self-study'),
             totalHours: document.getElementById('total-hours')
         };
-
-        // Hàm kiểm tra giới hạn số tiết
-        function checkLimits(theoryTotal, practiceTotal, selfStudyTotal, theoryCredits, practiceCredits, totalCredits) {
-            const theoryLimit = theoryCredits * 15;
-            const practiceLimit = practiceCredits * 30;
-            const selfStudyLimit = totalCredits * 30;
-            let errors = [];
-            if (theoryTotal > theoryLimit) {
-                errors.push(`Lý thuyết vượt quá giới hạn ${theoryLimit} tiết (hiện tại: ${theoryTotal}).`);
-            }
-            if (practiceTotal > practiceLimit) {
-                errors.push(`Thực hành vượt quá giới hạn ${practiceLimit} tiết (hiện tại: ${practiceTotal}).`);
-            }
-            if (selfStudyTotal > selfStudyLimit) {
-                errors.push(`Tự học vượt quá giới hạn ${selfStudyLimit} tiết (hiện tại: ${selfStudyTotal}).`);
-            }
-            if (errors.length > 0) {
-                limitErrorMessage.style.display = 'block';
-                limitDetailsSpan.textContent = errors.join(' ');
-            } else {
-                limitErrorMessage.style.display = 'none';
-                limitDetailsSpan.textContent = '';
-            }
-            return errors.length === 0;
-        }
 
         // Hàm xuất file Word
         async function exportToWord() {
@@ -267,7 +261,7 @@
                             spacing: { after: 200 }
                         }),
                         new Paragraph({
-                            text: `Số tín chỉ thực hành: ${practiceCreditsInput.value}`,
+                            text: `Số tín chỉ thực hành/thí nghiệm/thảo luận: ${practiceCreditsInput.value}`,
                             spacing: { after: 200 }
                         }),
                         new Paragraph({
@@ -293,32 +287,41 @@
                                     children: [
                                         new TableCell({ content: new Paragraph('Phân bổ các loại giờ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph('Lý thuyết (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph('Thực hành (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Thực hành/Thí nghiệm/Thảo luận (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph('Tự học, tự nghiên cứu (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph('Tổng (giờ)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
                                     ]
                                 }),
                                 new TableRow({
                                     children: [
-                                        new TableCell({ content: new Paragraph('Số giờ giảng dạy, học tập'), columnSpan: 5, margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                        new TableCell({ content: new Paragraph('Số giờ giảng dạy trực diện, trực tuyến'), columnSpan: 5, margins: { top: 100, bottom: 100, left: 100, right: 100 } })
                                     ]
                                 }),
                                 new TableRow({
                                     children: [
-                                        new TableCell({ content: new Paragraph('Trực tuyến đồng bộ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.theorySync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.practiceSync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.selfStudySync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableCells.totalSync.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                        new TableCell({ content: new Paragraph('Trực diện (tại phòng học)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryClassroom.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceClassroom.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyClassroom.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalClassroom.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
                                     ]
                                 }),
                                 new TableRow({
                                     children: [
-                                        new TableCell({ content: new Paragraph('Trực tuyến không đồng bộ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.theoryAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.practiceAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableCells.totalAsync.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                        new TableCell({ content: new Paragraph('Trực tuyến (đồng bộ hoặc không đồng bộ)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryOnline.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceOnline.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyOnline.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalOnline.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Đi thực tế, trải nghiệm'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryField.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceField.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyField.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalField.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
                                     ]
                                 }),
                                 new TableRow({
@@ -332,16 +335,7 @@
                                 }),
                                 new TableRow({
                                     children: [
-                                        new TableCell({ content: new Paragraph('Thư tín, học liệu (nếu có)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.theoryCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.practiceCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
-                                        new TableCell({ content: new Paragraph(tableCells.totalCorrespondence.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
-                                    ]
-                                }),
-                                new TableRow({
-                                    children: [
-                                        new TableCell({ content: new Paragraph('Tổng Số giờ giảng dạy, học tập'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Tổng Số giờ giảng dạy trực diện, trực tuyến'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph(tableCells.totalTheoryTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph(tableCells.totalPracticeTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph(tableCells.totalSelfStudyTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
@@ -360,6 +354,24 @@
                                         new TableCell({ content: new Paragraph(tableInputs.practiceSelfStudy.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph(tableInputs.selfStudyResearch.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
                                         new TableCell({ content: new Paragraph(tableCells.totalSelfStudy.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Làm việc nhóm'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryGroup.value), margins: { top: 100, bottom: 100, leds: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceGroup.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyGroup.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalGroup.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Hoạt động học tập trên LMS'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryLmsActivity.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceLmsActivity.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyLmsActivity.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalLmsActivity.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
                                     ]
                                 }),
                                 new TableRow({
@@ -411,97 +423,107 @@
             selfStudyPeriodsSpan.textContent = selfStudyPeriods.toFixed(1);
 
             // Gợi ý phân bổ ban đầu
-            const suggestedTheorySync = theoryCredits * 7.5;
-            const suggestedTheoryAsync = theoryCredits * 7.5;
-            const suggestedPracticeSync = practiceCredits * 15;
-            const suggestedPracticeAsync = practiceCredits * 15;
+            const suggestedTheoryOnline = theoryCredits * 7.5;
+            const suggestedPracticeOnline = practiceCredits * 15;
             const suggestedSelfStudyResearch = selfStudyPeriods;
 
             // Điền giá trị mặc định nếu ô input chưa được chỉnh sửa
-            if (!tableInputs.theorySync.dataset.edited) tableInputs.theorySync.value = suggestedTheorySync.toFixed(1);
-            if (!tableInputs.practiceSync.dataset.edited) tableInputs.practiceSync.value = suggestedPracticeSync.toFixed(1);
-            if (!tableInputs.selfStudySync.dataset.edited) tableInputs.selfStudySync.value = 0;
-            if (!tableInputs.theoryAsync.dataset.edited) tableInputs.theoryAsync.value = suggestedTheoryAsync.toFixed(1);
-            if (!tableInputs.practiceAsync.dataset.edited) tableInputs.practiceAsync.value = suggestedPracticeAsync.toFixed(1);
-            if (!tableInputs.selfStudyAsync.dataset.edited) tableInputs.selfStudyAsync.value = 0;
+            if (!tableInputs.theoryClassroom.dataset.edited) tableInputs.theoryClassroom.value = 0;
+            if (!tableInputs.practiceClassroom.dataset.edited) tableInputs.practiceClassroom.value = 0;
+            if (!tableInputs.selfStudyClassroom.dataset.edited) tableInputs.selfStudyClassroom.value = 0;
+            if (!tableInputs.theoryOnline.dataset.edited) tableInputs.theoryOnline.value = suggestedTheoryOnline.toFixed(1);
+            if (!tableInputs.practiceOnline.dataset.edited) tableInputs.practiceOnline.value = suggestedPracticeOnline.toFixed(1);
+            if (!tableInputs.selfStudyOnline.dataset.edited) tableInputs.selfStudyOnline.value = 0;
+            if (!tableInputs.theoryField.dataset.edited) tableInputs.theoryField.value = 0;
+            if (!tableInputs.practiceField.dataset.edited) tableInputs.practiceField.value = 0;
+            if (!tableInputs.selfStudyField.dataset.edited) tableInputs.selfStudyField.value = 0;
             if (!tableInputs.theoryLms.dataset.edited) tableInputs.theoryLms.value = 0;
             if (!tableInputs.practiceLms.dataset.edited) tableInputs.practiceLms.value = 0;
             if (!tableInputs.selfStudyLms.dataset.edited) tableInputs.selfStudyLms.value = 0;
-            if (!tableInputs.theoryCorrespondence.dataset.edited) tableInputs.theoryCorrespondence.value = 0;
-            if (!tableInputs.practiceCorrespondence.dataset.edited) tableInputs.practiceCorrespondence.value = 0;
-            if (!tableInputs.selfStudyCorrespondence.dataset.edited) tableInputs.selfStudyCorrespondence.value = 0;
             if (!tableInputs.theorySelfStudy.dataset.edited) tableInputs.theorySelfStudy.value = 0;
             if (!tableInputs.practiceSelfStudy.dataset.edited) tableInputs.practiceSelfStudy.value = 0;
             if (!tableInputs.selfStudyResearch.dataset.edited) tableInputs.selfStudyResearch.value = suggestedSelfStudyResearch.toFixed(1);
+            if (!tableInputs.theoryGroup.dataset.edited) tableInputs.theoryGroup.value = 0;
+            if (!tableInputs.practiceGroup.dataset.edited) tableInputs.practiceGroup.value = 0;
+            if (!tableInputs.selfStudyGroup.dataset.edited) tableInputs.selfStudyGroup.value = 0;
+            if (!tableInputs.theoryLmsActivity.dataset.edited) tableInputs.theoryLmsActivity.value = 0;
+            if (!tableInputs.practiceLmsActivity.dataset.edited) tableInputs.practiceLmsActivity.value = 0;
+            if (!tableInputs.selfStudyLmsActivity.dataset.edited) tableInputs.selfStudyLmsActivity.value = 0;
             if (!tableInputs.theoryAssessment.dataset.edited) tableInputs.theoryAssessment.value = 0;
             if (!tableInputs.practiceAssessment.dataset.edited) tableInputs.practiceAssessment.value = 0;
             if (!tableInputs.selfStudyAssessment.dataset.edited) tableInputs.selfStudyAssessment.value = 0;
 
             // Lấy giá trị từ các ô input
-            const theorySync = parseFloat(tableInputs.theorySync.value) || 0;
-            const practiceSync = parseFloat(tableInputs.practiceSync.value) || 0;
-            const selfStudySync = parseFloat(tableInputs.selfStudySync.value) || 0;
-            const theoryAsync = parseFloat(tableInputs.theoryAsync.value) || 0;
-            const practiceAsync = parseFloat(tableInputs.practiceAsync.value) || 0;
-            const selfStudyAsync = parseFloat(tableInputs.selfStudyAsync.value) || 0;
+            const theoryClassroom = parseFloat(tableInputs.theoryClassroom.value) || 0;
+            const practiceClassroom = parseFloat(tableInputs.practiceClassroom.value) || 0;
+            const selfStudyClassroom = parseFloat(tableInputs.selfStudyClassroom.value) || 0;
+            const theoryOnline = parseFloat(tableInputs.theoryOnline.value) || 0;
+            const practiceOnline = parseFloat(tableInputs.practiceOnline.value) || 0;
+            const selfStudyOnline = parseFloat(tableInputs.selfStudyOnline.value) || 0;
+            const theoryField = parseFloat(tableInputs.theoryField.value) || 0;
+            const practiceField = parseFloat(tableInputs.practiceField.value) || 0;
+            const selfStudyField = parseFloat(tableInputs.selfStudyField.value) || 0;
             const theoryLms = parseFloat(tableInputs.theoryLms.value) || 0;
             const practiceLms = parseFloat(tableInputs.practiceLms.value) || 0;
             const selfStudyLms = parseFloat(tableInputs.selfStudyLms.value) || 0;
-            const theoryCorrespondence = parseFloat(tableInputs.theoryCorrespondence.value) || 0;
-            const practiceCorrespondence = parseFloat(tableInputs.practiceCorrespondence.value) || 0;
-            const selfStudyCorrespondence = parseFloat(tableInputs.selfStudyCorrespondence.value) || 0;
             const theorySelfStudy = parseFloat(tableInputs.theorySelfStudy.value) || 0;
             const practiceSelfStudy = parseFloat(tableInputs.practiceSelfStudy.value) || 0;
             const selfStudyResearch = parseFloat(tableInputs.selfStudyResearch.value) || 0;
+            const theoryGroup = parseFloat(tableInputs.theoryGroup.value) || 0;
+            const practiceGroup = parseFloat(tableInputs.practiceGroup.value) || 0;
+            const selfStudyGroup = parseFloat(tableInputs.selfStudyGroup.value) || 0;
+            const theoryLmsActivity = parseFloat(tableInputs.theoryLmsActivity.value) || 0;
+            const practiceLmsActivity = parseFloat(tableInputs.practiceLmsActivity.value) || 0;
+            const selfStudyLmsActivity = parseFloat(tableInputs.selfStudyLmsActivity.value) || 0;
             const theoryAssessment = parseFloat(tableInputs.theoryAssessment.value) || 0;
             const practiceAssessment = parseFloat(tableInputs.practiceAssessment.value) || 0;
             const selfStudyAssessment = parseFloat(tableInputs.selfStudyAssessment.value) || 0;
 
             // Tính tổng số tiết cho mỗi hàng
-            const totalSyncPeriods = theorySync + practiceSync + selfStudySync;
-            const totalAsyncPeriods = theoryAsync + practiceAsync + selfStudyAsync;
+            const totalClassroomPeriods = theoryClassroom + practiceClassroom + selfStudyClassroom;
+            const totalOnlinePeriods = theoryOnline + practiceOnline + selfStudyOnline;
+            const totalFieldPeriods = theoryField + practiceField + selfStudyField;
             const totalLmsPeriods = theoryLms + practiceLms + selfStudyLms;
-            const totalCorrespondencePeriods = theoryCorrespondence + practiceCorrespondence + selfStudyCorrespondence;
             const totalSelfStudyPeriods = theorySelfStudy + practiceSelfStudy + selfStudyResearch;
+            const totalGroupPeriods = theoryGroup + practiceGroup + selfStudyGroup;
+            const totalLmsActivityPeriods = theoryLmsActivity + practiceLmsActivity + selfStudyLmsActivity;
             const totalAssessmentPeriods = theoryAssessment + practiceAssessment + selfStudyAssessment;
 
             // Quy đổi tiết sang giờ
-            const totalSyncHours = (totalSyncPeriods * 50) / 60;
-            const totalAsyncHours = (totalAsyncPeriods * 50) / 60;
+            const totalClassroomHours = (totalClassroomPeriods * 50) / 60;
+            const totalOnlineHours = (totalOnlinePeriods * 50) / 60;
+            const totalFieldHours = (totalFieldPeriods * 50) / 60;
             const totalLmsHours = (totalLmsPeriods * 50) / 60;
-            const totalCorrespondenceHours = (totalCorrespondencePeriods * 50) / 60;
             const totalSelfStudyHours = (totalSelfStudyPeriods * 50) / 60;
+            const totalGroupHours = (totalGroupPeriods * 50) / 60;
+            const totalLmsActivityHours = (totalLmsActivityPeriods * 50) / 60;
             const totalAssessmentHours = (totalAssessmentPeriods * 50) / 60;
 
             // Tính tổng số tiết cho mỗi cột
-            const totalTheoryTeaching = theorySync + theoryAsync + theoryLms + theoryCorrespondence;
-            const totalPracticeTeaching = practiceSync + practiceAsync + practiceLms + practiceCorrespondence;
-            const totalSelfStudyTeaching = selfStudySync + selfStudyAsync + selfStudyLms + selfStudyCorrespondence;
-            const totalTheoryOther = theorySelfStudy + theoryAssessment;
-            const totalPracticeOther = practiceSelfStudy + practiceAssessment;
-            const totalSelfStudyOther = selfStudyResearch + selfStudyAssessment;
+            const totalTheoryTeaching = theoryClassroom + theoryOnline + theoryField + theoryLms;
+            const totalPracticeTeaching = practiceClassroom + practiceOnline + practiceField + practiceLms;
+            const totalSelfStudyTeaching = selfStudyClassroom + selfStudyOnline + selfStudyField + selfStudyLms;
+            const totalTheoryOther = theorySelfStudy + theoryGroup + theoryLmsActivity + theoryAssessment;
+            const totalPracticeOther = practiceSelfStudy + practiceGroup + practiceLmsActivity + practiceAssessment;
+            const totalSelfStudyOther = selfStudyResearch + selfStudyGroup + selfStudyLmsActivity + selfStudyAssessment;
 
             // Tính tổng giờ
-            const totalTeachingHours = totalSyncHours + totalAsyncHours + totalLmsHours + totalCorrespondenceHours;
-            const totalOtherHours = totalSelfStudyHours + totalAssessmentHours;
+            const totalTeachingHours = totalClassroomHours + totalOnlineHours + totalFieldHours + totalLmsHours;
+            const totalOtherHours = totalSelfStudyHours + totalGroupHours + totalLmsActivityHours + totalAssessmentHours;
             const totalHours = totalTeachingHours + totalOtherHours;
-
-            // Kiểm tra giới hạn
-            const totalTheory = totalTheoryTeaching + totalTheoryOther;
-            const totalPractice = totalPracticeTeaching + totalPracticeOther;
-            const totalSelfStudy = totalSelfStudyTeaching + totalSelfStudyOther;
-            checkLimits(totalTheory, totalPractice, totalSelfStudy, theoryCredits, practiceCredits, totalCredits);
 
             // Tính số giờ yêu cầu (50 giờ/tín chỉ)
             const requiredHours = totalCredits * 50;
             const hoursNeeded = requiredHours - totalHours;
 
             // Cập nhật bảng
-            tableCells.totalSync.textContent = totalSyncHours.toFixed(2);
-            tableCells.totalAsync.textContent = totalAsyncHours.toFixed(2);
+            tableCells.totalClassroom.textContent = totalClassroomHours.toFixed(2);
+            tableCells.totalOnline.textContent = totalOnlineHours.toFixed(2);
+            tableCells.totalField.textContent = totalFieldHours.toFixed(2);
             tableCells.totalLms.textContent = totalLmsHours.toFixed(2);
-            tableCells.totalCorrespondence.textContent = totalCorrespondenceHours.toFixed(2);
             tableCells.totalSelfStudy.textContent = totalSelfStudyHours.toFixed(2);
+            tableCells.totalGroup.textContent = totalGroupHours.toFixed(2);
+            tableCells.totalLmsActivity.textContent = totalLmsActivityHours.toFixed(2);
             tableCells.totalAssessment.textContent = totalAssessmentHours.toFixed(2);
             tableCells.totalTheoryTeaching.textContent = totalTheoryTeaching.toFixed(1);
             tableCells.totalPracticeTeaching.textContent = totalPracticeTeaching.toFixed(1);
@@ -511,9 +533,9 @@
             tableCells.totalPracticeOther.textContent = totalPracticeOther.toFixed(1);
             tableCells.totalSelfStudyOther.textContent = totalSelfStudyOther.toFixed(1);
             tableCells.totalOtherHours.textContent = totalOtherHours.toFixed(2);
-            tableCells.totalTheory.textContent = totalTheory.toFixed(1);
-            tableCells.totalPractice.textContent = totalPractice.toFixed(1);
-            tableCells.totalSelfStudy.textContent = totalSelfStudy.toFixed(1);
+            tableCells.totalTheory.textContent = (totalTheoryTeaching + totalTheoryOther).toFixed(1);
+            tableCells.totalPractice.textContent = (totalPracticeTeaching + totalPracticeOther).toFixed(1);
+            tableCells.totalSelfStudy.textContent = (totalSelfStudyTeaching + totalSelfStudyOther).toFixed(1);
             tableCells.totalHours.textContent = totalHours.toFixed(2);
 
             // Cập nhật thông báo gợi ý
