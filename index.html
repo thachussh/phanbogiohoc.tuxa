@@ -6,7 +6,6 @@
     <title>Phân bổ các loại giờ (Dành cho hệ Đào tạo từ xa)</title>
     <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,6 +14,7 @@
         }
         h1, h2 {
             color: #333;
+            text-align: center;
         }
         .section {
             margin-bottom: 20px;
@@ -59,10 +59,6 @@
         }
         .button:hover {
             background-color: #45a049;
-        }
-        #chart-container {
-            max-width: 600px;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -172,11 +168,6 @@
         </table>
     </div>
 
-    <div id="chart-container">
-        <h2>Biểu đồ phân bổ giờ</h2>
-        <canvas id="allocation-chart"></canvas>
-    </div>
-
     <div>
         <a href="#" class="button" onclick="exportToWord()">Tải file Word</a>
     </div>
@@ -233,49 +224,6 @@
             totalSelfStudy: document.getElementById('total-self-study'),
             totalHours: document.getElementById('total-hours')
         };
-
-        // Khởi tạo biểu đồ
-        let allocationChart;
-        function initChart() {
-            const ctx = document.getElementById('allocation-chart').getContext('2d');
-            allocationChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Trực tuyến đồng bộ', 'Trực tuyến không đồng bộ', 'LMS', 'Thư tín', 'Tự học, tự nghiên cứu', 'Ôn thi'],
-                    datasets: [
-                        {
-                            label: 'Lý thuyết (giờ)',
-                            data: [0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        },
-                        {
-                            label: 'Thực hành (giờ)',
-                            data: [0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        },
-                        {
-                            label: 'Tự học (giờ)',
-                            data: [0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        x: { stacked: true },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            title: { display: true, text: 'Số giờ' }
-                        }
-                    },
-                    plugins: {
-                        title: { display: true, text: 'Phân bổ giờ theo loại và hạng mục' },
-                        legend: { position: 'top' }
-                    }
-                }
-            });
-        }
 
         // Hàm kiểm tra giới hạn số tiết
         function checkLimits(theoryTotal, practiceTotal, selfStudyTotal, theoryCredits, practiceCredits, totalCredits) {
@@ -575,33 +523,6 @@
 
             // Kiểm tra lỗi tín chỉ
             errorMessage.style.display = totalCredits === 0 ? 'block' : 'none';
-
-            // Cập nhật biểu đồ
-            allocationChart.data.datasets[0].data = [
-                (theorySync * 50 / 60).toFixed(2),
-                (theoryAsync * 50 / 60).toFixed(2),
-                (theoryLms * 50 / 60).toFixed(2),
-                (theoryCorrespondence * 50 / 60).toFixed(2),
-                (theorySelfStudy * 50 / 60).toFixed(2),
-                (theoryAssessment * 50 / 60).toFixed(2)
-            ];
-            allocationChart.data.datasets[1].data = [
-                (practiceSync * 50 / 60).toFixed(2),
-                (practiceAsync * 50 / 60).toFixed(2),
-                (practiceLms * 50 / 60).toFixed(2),
-                (practiceCorrespondence * 50 / 60).toFixed(2),
-                (practiceSelfStudy * 50 / 60).toFixed(2),
-                (practiceAssessment * 50 / 60).toFixed(2)
-            ];
-            allocationChart.data.datasets[2].data = [
-                (selfStudySync * 50 / 60).toFixed(2),
-                (selfStudyAsync * 50 / 60).toFixed(2),
-                (selfStudyLms * 50 / 60).toFixed(2),
-                (selfStudyCorrespondence * 50 / 60).toFixed(2),
-                (selfStudyResearch * 50 / 60).toFixed(2),
-                (selfStudyAssessment * 50 / 60).toFixed(2)
-            ];
-            allocationChart.update();
         }
 
         // Gắn sự kiện input và đánh dấu ô đã chỉnh sửa
@@ -621,8 +542,7 @@
             input.addEventListener('input', updateAllocation);
         });
 
-        // Khởi tạo biểu đồ và chạy lần đầu
-        initChart();
+        // Chạy lần đầu để hiển thị giá trị mặc định
         updateAllocation();
     </script>
 </body>
