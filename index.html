@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phân bổ các loại giờ (Dành cho hệ Đào tạo từ xa)</title>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,7 +33,7 @@
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        .error, .suggestion {
+        .error, .suggestion, .limit-error {
             color: red;
             font-weight: bold;
         }
@@ -51,11 +54,15 @@
             color: white;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            margin: 10px;
             cursor: pointer;
         }
         .button:hover {
             background-color: #45a049;
+        }
+        #chart-container {
+            max-width: 600px;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -75,6 +82,7 @@
         <p><strong>Tổng số tín chỉ:</strong> <span id="total-credits">0</span></p>
         <p><strong>Tự học (tiết):</strong> <span id="self-study-periods">0</span></p>
         <p id="error-message" class="error" style="display: none;">Lỗi: Tổng tín chỉ không khớp!</p>
+        <p id="limit-error-message" class="limit-error" style="display: none;">Lỗi: Tổng số tiết vượt quá giới hạn! <span id="limit-details"></span></p>
         <p id="suggestion-message" class="suggestion" style="display: none;">Gợi ý: Cần thêm <span id="hours-needed">0</span> giờ để đạt tổng <span id="hours-required">0</span> giờ học tập.</p>
     </div>
 
@@ -164,7 +172,14 @@
         </table>
     </div>
 
-    <a href="#" class="button" onclick="alert('Chức năng tải file Word cần backend hỗ trợ!')">Tải file Word</a>
+    <div id="chart-container">
+        <h2>Biểu đồ phân bổ giờ</h2>
+        <canvas id="allocation-chart"></canvas>
+    </div>
+
+    <div>
+        <a href="#" class="button" onclick="exportToWord()">Tải file Word</a>
+    </div>
 
     <script>
         // Lấy các phần tử input và output
@@ -173,6 +188,8 @@
         const totalCreditsSpan = document.getElementById('total-credits');
         const selfStudyPeriodsSpan = document.getElementById('self-study-periods');
         const errorMessage = document.getElementById('error-message');
+        const limitErrorMessage = document.getElementById('limit-error-message');
+        const limitDetailsSpan = document.getElementById('limit-details');
         const suggestionMessage = document.getElementById('suggestion-message');
         const hoursNeededSpan = document.getElementById('hours-needed');
         const hoursRequiredSpan = document.getElementById('hours-required');
@@ -217,6 +234,222 @@
             totalHours: document.getElementById('total-hours')
         };
 
+        // Khởi tạo biểu đồ
+        let allocationChart;
+        function initChart() {
+            const ctx = document.getElementById('allocation-chart').getContext('2d');
+            allocationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Trực tuyến đồng bộ', 'Trực tuyến không đồng bộ', 'LMS', 'Thư tín', 'Tự học, tự nghiên cứu', 'Ôn thi'],
+                    datasets: [
+                        {
+                            label: 'Lý thuyết (giờ)',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        },
+                        {
+                            label: 'Thực hành (giờ)',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        },
+                        {
+                            label: 'Tự học (giờ)',
+                            data: [0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { stacked: true },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: { display: true, text: 'Số giờ' }
+                        }
+                    },
+                    plugins: {
+                        title: { display: true, text: 'Phân bổ giờ theo loại và hạng mục' },
+                        legend: { position: 'top' }
+                    }
+                }
+            });
+        }
+
+        // Hàm kiểm tra giới hạn số tiết
+        function checkLimits(theoryTotal, practiceTotal, selfStudyTotal, theoryCredits, practiceCredits, totalCredits) {
+            const theoryLimit = theoryCredits * 15;
+            const practiceLimit = practiceCredits * 30;
+            const selfStudyLimit = totalCredits * 30;
+            let errors = [];
+            if (theoryTotal > theoryLimit) {
+                errors.push(`Lý thuyết vượt quá giới hạn ${theoryLimit} tiết (hiện tại: ${theoryTotal}).`);
+            }
+            if (practiceTotal > practiceLimit) {
+                errors.push(`Thực hành vượt quá giới hạn ${practiceLimit} tiết (hiện tại: ${practiceTotal}).`);
+            }
+            if (selfStudyTotal > selfStudyLimit) {
+                errors.push(`Tự học vượt quá giới hạn ${selfStudyLimit} tiết (hiện tại: ${selfStudyTotal}).`);
+            }
+            if (errors.length > 0) {
+                limitErrorMessage.style.display = 'block';
+                limitDetailsSpan.textContent = errors.join(' ');
+            } else {
+                limitErrorMessage.style.display = 'none';
+                limitDetailsSpan.textContent = '';
+            }
+            return errors.length === 0;
+        }
+
+        // Hàm xuất file Word
+        async function exportToWord() {
+            const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } = docx;
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({
+                            text: 'Phân bổ các loại giờ (Dành cho hệ Đào tạo từ xa)',
+                            heading: docx.HeadingLevel.HEADING_1,
+                            alignment: docx.AlignmentType.CENTER
+                        }),
+                        new Paragraph({
+                            text: `Số tín chỉ lý thuyết: ${theoryCreditsInput.value}`,
+                            spacing: { after: 200 }
+                        }),
+                        new Paragraph({
+                            text: `Số tín chỉ thực hành: ${practiceCreditsInput.value}`,
+                            spacing: { after: 200 }
+                        }),
+                        new Paragraph({
+                            text: `Tổng số tín chỉ: ${totalCreditsSpan.textContent}`,
+                            spacing: { after: 200 }
+                        }),
+                        new Paragraph({
+                            text: `Tự học (tiết): ${selfStudyPeriodsSpan.textContent}`,
+                            spacing: { after: 200 }
+                        }),
+                        new Paragraph({
+                            text: suggestionMessage.style.display === 'block' ? suggestionMessage.textContent : '',
+                            spacing: { after: 200 }
+                        }),
+                        new Paragraph({
+                            text: 'Phân bổ cụ thể',
+                            heading: docx.HeadingLevel.HEADING_2
+                        }),
+                        new Table({
+                            width: { size: 100, type: WidthType.PERCENTAGE },
+                            rows: [
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Phân bổ các loại giờ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Lý thuyết (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Thực hành (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Tự học, tự nghiên cứu (tiết)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph('Tổng (giờ)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Số giờ giảng dạy, học tập'), columnSpan: 5, margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Trực tuyến đồng bộ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theorySync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceSync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudySync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalSync.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Trực tuyến không đồng bộ'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyAsync.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalAsync.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('LMS (có hướng dẫn)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryLms.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceLms.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyLms.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalLms.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Thư tín, học liệu (nếu có)'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyCorrespondence.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalCorrespondence.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Tổng Số giờ giảng dạy, học tập'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalTheoryTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalPracticeTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalSelfStudyTeaching.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalTeachingHours.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Số giờ tự học và khác'), columnSpan: 5, margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Tự học, tự nghiên cứu'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theorySelfStudy.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceSelfStudy.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyResearch.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalSelfStudy.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Ôn thi, dự thi, kiểm tra'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.theoryAssessment.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.practiceAssessment.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableInputs.selfStudyAssessment.value), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalAssessment.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Tổng Số giờ tự học và khác'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalTheoryOther.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalPracticeOther.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalSelfStudyOther.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalOtherHours.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                }),
+                                new TableRow({
+                                    children: [
+                                        new TableCell({ content: new Paragraph('Tổng'), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalTheory.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalPractice.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalSelfStudy.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } }),
+                                        new TableCell({ content: new Paragraph(tableCells.totalHours.textContent), margins: { top: 100, bottom: 100, left: 100, right: 100 } })
+                                    ]
+                                })
+                            ]
+                        })
+                    ]
+                }]
+            });
+            const blob = await Packer.toBlob(doc);
+            saveAs(blob, 'PhanBoCacLoaiGio.docx');
+        }
+
         // Hàm tính toán và cập nhật bảng
         function updateAllocation() {
             // Lấy số tín chỉ từ input
@@ -226,15 +459,15 @@
             // Tính tổng số tín chỉ và tự học
             const totalCredits = theoryCredits + practiceCredits;
             totalCreditsSpan.textContent = totalCredits;
-            const selfStudyPeriods = totalCredits * 30; // Tổng số tín chỉ × 30 tiết
+            const selfStudyPeriods = totalCredits * 30;
             selfStudyPeriodsSpan.textContent = selfStudyPeriods.toFixed(1);
 
             // Gợi ý phân bổ ban đầu
-            const suggestedTheorySync = theoryCredits * 7.5; // 15 tiết/tín chỉ chia đều
+            const suggestedTheorySync = theoryCredits * 7.5;
             const suggestedTheoryAsync = theoryCredits * 7.5;
-            const suggestedPracticeSync = practiceCredits * 15; // 30 tiết/tín chỉ chia đều
+            const suggestedPracticeSync = practiceCredits * 15;
             const suggestedPracticeAsync = practiceCredits * 15;
-            const suggestedSelfStudyResearch = selfStudyPeriods; // Tự học mặc định vào Tự học, tự nghiên cứu
+            const suggestedSelfStudyResearch = selfStudyPeriods;
 
             // Điền giá trị mặc định nếu ô input chưa được chỉnh sửa
             if (!tableInputs.theorySync.dataset.edited) tableInputs.theorySync.value = suggestedTheorySync.toFixed(1);
@@ -284,7 +517,7 @@
             const totalSelfStudyPeriods = theorySelfStudy + practiceSelfStudy + selfStudyResearch;
             const totalAssessmentPeriods = theoryAssessment + practiceAssessment + selfStudyAssessment;
 
-            // Quy đổi tiết sang giờ (1 tiết = 50 phút)
+            // Quy đổi tiết sang giờ
             const totalSyncHours = (totalSyncPeriods * 50) / 60;
             const totalAsyncHours = (totalAsyncPeriods * 50) / 60;
             const totalLmsHours = (totalLmsPeriods * 50) / 60;
@@ -305,6 +538,12 @@
             const totalOtherHours = totalSelfStudyHours + totalAssessmentHours;
             const totalHours = totalTeachingHours + totalOtherHours;
 
+            // Kiểm tra giới hạn
+            const totalTheory = totalTheoryTeaching + totalTheoryOther;
+            const totalPractice = totalPracticeTeaching + totalPracticeOther;
+            const totalSelfStudy = totalSelfStudyTeaching + totalSelfStudyOther;
+            checkLimits(totalTheory, totalPractice, totalSelfStudy, theoryCredits, practiceCredits, totalCredits);
+
             // Tính số giờ yêu cầu (50 giờ/tín chỉ)
             const requiredHours = totalCredits * 50;
             const hoursNeeded = requiredHours - totalHours;
@@ -324,9 +563,9 @@
             tableCells.totalPracticeOther.textContent = totalPracticeOther.toFixed(1);
             tableCells.totalSelfStudyOther.textContent = totalSelfStudyOther.toFixed(1);
             tableCells.totalOtherHours.textContent = totalOtherHours.toFixed(2);
-            tableCells.totalTheory.textContent = (totalTheoryTeaching + totalTheoryOther).toFixed(1);
-            tableCells.totalPractice.textContent = (totalPracticeTeaching + totalPracticeOther).toFixed(1);
-            tableCells.totalSelfStudy.textContent = (totalSelfStudyTeaching + totalSelfStudyOther).toFixed(1);
+            tableCells.totalTheory.textContent = totalTheory.toFixed(1);
+            tableCells.totalPractice.textContent = totalPractice.toFixed(1);
+            tableCells.totalSelfStudy.textContent = totalSelfStudy.toFixed(1);
             tableCells.totalHours.textContent = totalHours.toFixed(2);
 
             // Cập nhật thông báo gợi ý
@@ -334,8 +573,35 @@
             hoursNeededSpan.textContent = hoursNeeded > 0 ? hoursNeeded.toFixed(2) : 0;
             suggestionMessage.style.display = totalCredits > 0 && hoursNeeded > 0 ? 'block' : 'none';
 
-            // Kiểm tra lỗi
+            // Kiểm tra lỗi tín chỉ
             errorMessage.style.display = totalCredits === 0 ? 'block' : 'none';
+
+            // Cập nhật biểu đồ
+            allocationChart.data.datasets[0].data = [
+                (theorySync * 50 / 60).toFixed(2),
+                (theoryAsync * 50 / 60).toFixed(2),
+                (theoryLms * 50 / 60).toFixed(2),
+                (theoryCorrespondence * 50 / 60).toFixed(2),
+                (theorySelfStudy * 50 / 60).toFixed(2),
+                (theoryAssessment * 50 / 60).toFixed(2)
+            ];
+            allocationChart.data.datasets[1].data = [
+                (practiceSync * 50 / 60).toFixed(2),
+                (practiceAsync * 50 / 60).toFixed(2),
+                (practiceLms * 50 / 60).toFixed(2),
+                (practiceCorrespondence * 50 / 60).toFixed(2),
+                (practiceSelfStudy * 50 / 60).toFixed(2),
+                (practiceAssessment * 50 / 60).toFixed(2)
+            ];
+            allocationChart.data.datasets[2].data = [
+                (selfStudySync * 50 / 60).toFixed(2),
+                (selfStudyAsync * 50 / 60).toFixed(2),
+                (selfStudyLms * 50 / 60).toFixed(2),
+                (selfStudyCorrespondence * 50 / 60).toFixed(2),
+                (selfStudyResearch * 50 / 60).toFixed(2),
+                (selfStudyAssessment * 50 / 60).toFixed(2)
+            ];
+            allocationChart.update();
         }
 
         // Gắn sự kiện input và đánh dấu ô đã chỉnh sửa
@@ -343,11 +609,11 @@
             event.target.dataset.edited = 'true';
         }
         theoryCreditsInput.addEventListener('input', () => {
-            Object.values(tableInputs).forEach(input => delete input.dataset.edited); // Reset edited state
+            Object.values(tableInputs).forEach(input => delete input.dataset.edited);
             updateAllocation();
         });
         practiceCreditsInput.addEventListener('input', () => {
-            Object.values(tableInputs).forEach(input => delete input.dataset.edited); // Reset edited state
+            Object.values(tableInputs).forEach(input => delete input.dataset.edited);
             updateAllocation();
         });
         Object.values(tableInputs).forEach(input => {
@@ -355,7 +621,8 @@
             input.addEventListener('input', updateAllocation);
         });
 
-        // Chạy lần đầu để hiển thị giá trị mặc định
+        // Khởi tạo biểu đồ và chạy lần đầu
+        initChart();
         updateAllocation();
     </script>
 </body>
