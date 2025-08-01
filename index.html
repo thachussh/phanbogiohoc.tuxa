@@ -155,7 +155,7 @@
                     <td><input type="number" id="theory-self-study" min="0" value="0"></td>
                     <td><input type="number" id="practice-self-study" min="0" value="0"></td>
                     <td><input type="number" id="self-study-research" min="0" value="0"></td>
-                    <td id="total-self-study">0</td>
+                    <td id="total-self-study-research-hours">0</td>
                 </tr>
                 <tr>
                     <td>Ôn thi, dự thi, kiểm tra</td>
@@ -223,7 +223,7 @@
             totalAsync: document.getElementById('total-async'),
             totalLms: document.getElementById('total-lms'),
             totalCorrespondence: document.getElementById('total-correspondence'),
-            totalSelfStudy: document.getElementById('total-self-study'),
+            totalSelfStudy: document.getElementById('total-self-study-research-hours'),
             totalAssessment: document.getElementById('total-assessment'),
             totalTheoryTeaching: document.getElementById('total-theory-teaching'),
             totalPracticeTeaching: document.getElementById('total-practice-teaching'),
@@ -235,7 +235,7 @@
             totalOtherHours: document.getElementById('total-other-hours'),
             totalTheory: document.getElementById('total-theory'),
             totalPractice: document.getElementById('total-practice'),
-            totalSelfStudy: document.getElementById('total-self-study'),
+            totalSelfStudyAll: document.getElementById('total-self-study'),
             totalHours: document.getElementById('total-hours')
         };
 
@@ -314,6 +314,10 @@
             const totalSelfStudyHours = (totalSelfStudyPeriods * 50) / 60;
             const totalAssessmentHours = (totalAssessmentPeriods * 50) / 60;
 
+            // In giá trị để kiểm tra lỗi
+            console.log('Tự học, tự nghiên cứu - Tổng tiết:', totalSelfStudyPeriods);
+            console.log('Tự học, tự nghiên cứu - Tổng giờ:', totalSelfStudyHours);
+
             // Tính tổng số tiết cho mỗi cột
             const totalTheoryTeaching = theorySync + theoryAsync + theoryLms + theoryCorrespondence;
             const totalPracticeTeaching = practiceSync + practiceAsync + practiceLms + practiceCorrespondence;
@@ -348,7 +352,7 @@
             tableCells.totalOtherHours.textContent = Math.round(totalOtherHours);
             tableCells.totalTheory.textContent = Math.round(totalTheoryTeaching + totalTheoryOther);
             tableCells.totalPractice.textContent = Math.round(totalPracticeTeaching + totalPracticeOther);
-            tableCells.totalSelfStudy.textContent = Math.round(totalSelfStudyTeaching + totalSelfStudyOther);
+            tableCells.totalSelfStudyAll.textContent = Math.round(totalSelfStudyTeaching + totalSelfStudyOther);
             tableCells.totalHours.textContent = Math.round(totalHours);
 
             // Kiểm tra lỗi
