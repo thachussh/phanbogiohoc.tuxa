@@ -3,36 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phân bổ các loại giờ (Hệ Đào tạo từ xa)</title>
+    <title>Phân bổ các loại giờ (Dành cho hệ Đào tạo từ xa)</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 800px; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; }
-        .success { color: green; }
-        .buttons { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .suggestion {
+            color: orange;
+            font-weight: bold;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            margin-right: 10px;
+        }
+        .input-group input, td input {
+            padding: 5px;
+            width: 60px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .buttons-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #ffeeba;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Phân bổ các loại giờ</h1>
-        <h3>(Dành cho hệ Đào tạo từ xa)</h3>
+    <h1 style="text-align:center">Phân bổ các loại giờ <br> (Dành cho hệ Đào tạo từ xa)</h1>
 
+    <div class="section">
         <h2>Thông tin học phần</h2>
-        <label>Số tín chỉ lý thuyết: </label>
-        <input type="number" id="lyThuyet" min="0" value="0" oninput="calculateCredits()">
-        <br><br>
-        <label>Số tín chỉ thực hành: </label>
-        <input type="number" id="thucHanh" min="0" value="0" oninput="calculateCredits()">
-        <br><br>
-        <p>Tổng số tín chỉ: <span id="tongTinChi">0</span></p>
-        <p>Tự học (tiết): <span id="tuHoc">0</span></p>
-        <p id="errorMessage" class="error"></p>
+        <div class="input-group">
+            <label for="theory-credits">Số tín chỉ lý thuyết:</label>
+            <input type="number" id="theory-credits" min="0" value="0">
+        </div>
+        <div class="input-group">
+            <label for="practice-credits">Số tín chỉ thực hành:</label>
+            <input type="number" id="practice-credits" min="0" value="0">
+        </div>
+        <p><strong>Tổng số tín chỉ:</strong> <span id="total-credits">0</span></p>
+        <p><strong>Tự học (tiết):</strong> <span id="self-study-periods">0</span></p>
+        <p id="error-message" class="error" style="display: none;">Lỗi: Tổng tín chỉ không khớp!</p>
+        <p id="suggestion-message" class="suggestion" style="display: none;">Gợi ý: Cần thêm <span id="hours-needed">0</span> giờ để đạt tổng <span id="hours-required">0</span> giờ học tập.</p>
+    </div>
 
+    <div class="section">
         <h2>Phân bổ cụ thể</h2>
-        <table>
+        <table id="allocation-table">
             <thead>
                 <tr>
                     <th>Phân bổ các loại giờ</th>
@@ -44,161 +110,508 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="5"><b>Số giờ giảng dạy, học tập</b></td>
+                    <td colspan="5"><strong>Số giờ giảng dạy, học tập</strong></td>
                 </tr>
                 <tr>
                     <td>Trực tuyến đồng bộ</td>
-                    <td id="ttDongBo">0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-sync" min="0" value="0"></td>
+                    <td><input type="number" id="practice-sync" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-sync" min="0" value="0"></td>
+                    <td id="total-sync">0</td>
                 </tr>
                 <tr>
                     <td>Trực tuyến không đồng bộ</td>
-                    <td id="ttKhongDongBo">0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-async" min="0" value="0"></td>
+                    <td><input type="number" id="practice-async" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-async" min="0" value="0"></td>
+                    <td id="total-async">0</td>
                 </tr>
                 <tr>
                     <td>LMS (có hướng dẫn)</td>
-                    <td id="lms">0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-lms" min="0" value="0"></td>
+                    <td><input type="number" id="practice-lms" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-lms" min="0" value="0"></td>
+                    <td id="total-lms">0</td>
                 </tr>
                 <tr>
                     <td>Thư tín, học liệu (nếu có)</td>
-                    <td id="thuTin">0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-correspondence" min="0" value="0"></td>
+                    <td><input type="number" id="practice-correspondence" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-correspondence" min="0" value="0"></td>
+                    <td id="total-correspondence">0</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>Tổng Số giờ giảng dạy, học tập</strong></td>
+                    <td id="total-theory-teaching">0</td>
+                    <td id="total-practice-teaching">0</td>
+                    <td id="total-self-study-teaching">0</td>
+                    <td id="total-teaching-hours">0</td>
                 </tr>
                 <tr>
-                    <td><b>Tổng Số giờ giảng dạy, học tập</b></td>
-                    <td id="tongGiangDay">0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td id="tongGiangDayGio">0</td>
-                </tr>
-                <tr>
-                    <td colspan="5"><b>Số giờ tự học và khác</b></td>
+                    <td colspan="5"><strong>Số giờ tự học và khác</strong></td>
                 </tr>
                 <tr>
                     <td>Tự học, tự nghiên cứu</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td id="tuHocNghienCuu">0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-self-study" min="0" value="0"></td>
+                    <td><input type="number" id="practice-self-study" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-research" min="0" value="0"></td>
+                    <td id="total-self-study">0</td>
                 </tr>
                 <tr>
                     <td>Ôn thi, dự thi, kiểm tra</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td id="onThi">0</td>
-                    <td>0</td>
+                    <td><input type="number" id="theory-assessment" min="0" value="0"></td>
+                    <td><input type="number" id="practice-assessment" min="0" value="0"></td>
+                    <td><input type="number" id="self-study-assessment" min="0" value="0"></td>
+                    <td id="total-assessment">0</td>
                 </tr>
-                <tr>
-                    <td><b>Tổng Số giờ tự học và khác</b></td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td id="tongTuHoc">0</td>
-                    <td id="tongTuHocGio">0</td>
+                <tr class="total-row">
+                    <td><strong>Tổng Số giờ tự học và khác</strong></td>
+                    <td id="total-theory-other">0</td>
+                    <td id="total-practice-other">0</td>
+                    <td id="total-self-study-other">0</td>
+                    <td id="total-other-hours">0</td>
                 </tr>
-                <tr>
-                    <td><b>Tổng</b></td>
-                    <td id="tongLyThuyet">0</td>
-                    <td id="tongThucHanh">0</td>
-                    <td id="tongTuHocNghienCuu">0</td>
-                    <td id="tongGio">0</td>
+                <tr class="total-row">
+                    <td><strong>Tổng</strong></td>
+                    <td id="total-theory">0</td>
+                    <td id="total-practice">0</td>
+                    <td id="total-self-study">0</td>
+                    <td id="total-hours">0</td>
                 </tr>
             </tbody>
         </table>
+    </div>
 
-        <div class="buttons">
-            <button onclick="downloadWord()">📄 Tải file Word</button>
-            <button onclick="downloadHTML()">🌐 Tải file HTML</button>
-            <button onclick="printTable()">🖨️ In bảng</button>
-        </div>
+    <div class="buttons-container">
+        <button class="button" onclick="exportToWord()">📄 Tải file Word</button>
     </div>
 
     <script>
-        function calculateCredits() {
-            // Lấy giá trị đầu vào
-            const lyThuyet = parseInt(document.getElementById('lyThuyet').value) || 0;
-            const thucHanh = parseInt(document.getElementById('thucHanh').value) || 0;
+        // Lấy các phần tử input và output
+        const theoryCreditsInput = document.getElementById('theory-credits');
+        const practiceCreditsInput = document.getElementById('practice-credits');
+        const totalCreditsSpan = document.getElementById('total-credits');
+        const selfStudyPeriodsSpan = document.getElementById('self-study-periods');
+        const errorMessage = document.getElementById('error-message');
+        const suggestionMessage = document.getElementById('suggestion-message');
+        const hoursNeededSpan = document.getElementById('hours-needed');
+        const hoursRequiredSpan = document.getElementById('hours-required');
 
-            // Tính tổng tín chỉ
-            const tongTinChi = lyThuyet + thucHanh;
-            document.getElementById('tongTinChi').textContent = tongTinChi;
+        const tableInputs = {
+            theorySync: document.getElementById('theory-sync'),
+            practiceSync: document.getElementById('practice-sync'),
+            selfStudySync: document.getElementById('self-study-sync'),
+            theoryAsync: document.getElementById('theory-async'),
+            practiceAsync: document.getElementById('practice-async'),
+            selfStudyAsync: document.getElementById('self-study-async'),
+            theoryLms: document.getElementById('theory-lms'),
+            practiceLms: document.getElementById('practice-lms'),
+            selfStudyLms: document.getElementById('self-study-lms'),
+            theoryCorrespondence: document.getElementById('theory-correspondence'),
+            practiceCorrespondence: document.getElementById('practice-correspondence'),
+            selfStudyCorrespondence: document.getElementById('self-study-correspondence'),
+            theorySelfStudy: document.getElementById('theory-self-study'),
+            practiceSelfStudy: document.getElementById('practice-self-study'),
+            selfStudyResearch: document.getElementById('self-study-research'),
+            theoryAssessment: document.getElementById('theory-assessment'),
+            practiceAssessment: document.getElementById('practice-assessment'),
+            selfStudyAssessment: document.getElementById('self-study-assessment')
+        };
 
-            // Tính số tiết tự học (45 tiết/tín chỉ)
-            const tuHoc = tongTinChi * 45;
-            document.getElementById('tuHoc').textContent = tuHoc;
+        const tableCells = {
+            totalSync: document.getElementById('total-sync'),
+            totalAsync: document.getElementById('total-async'),
+            totalLms: document.getElementById('total-lms'),
+            totalCorrespondence: document.getElementById('total-correspondence'),
+            totalSelfStudy: document.getElementById('total-self-study'),
+            totalAssessment: document.getElementById('total-assessment'),
+            totalTheoryTeaching: document.getElementById('total-theory-teaching'),
+            totalPracticeTeaching: document.getElementById('total-practice-teaching'),
+            totalSelfStudyTeaching: document.getElementById('total-self-study-teaching'),
+            totalTeachingHours: document.getElementById('total-teaching-hours'),
+            totalTheoryOther: document.getElementById('total-theory-other'),
+            totalPracticeOther: document.getElementById('total-practice-other'),
+            totalSelfStudyOther: document.getElementById('total-self-study-other'),
+            totalOtherHours: document.getElementById('total-other-hours'),
+            totalTheory: document.getElementById('total-theory'),
+            totalPractice: document.getElementById('total-practice'),
+            totalSelfStudy: document.getElementById('total-self-study'),
+            totalHours: document.getElementById('total-hours')
+        };
 
-            // Kiểm tra lỗi
-            const errorMessage = document.getElementById('errorMessage');
-            if (tongTinChi === 0) {
-                errorMessage.textContent = 'Vui lòng nhập số tín chỉ lớn hơn 0!';
-                return;
-            } else {
-                errorMessage.textContent = '';
-            }
+        // Hàm tính toán và cập nhật bảng
+        function updateAllocation() {
+            // Lấy số tín chỉ từ input
+            const theoryCredits = parseFloat(theoryCreditsInput.value) || 0;
+            const practiceCredits = parseFloat(practiceCreditsInput.value) || 0;
 
-            // Quy đổi tín chỉ thành tiết
-            const tietLyThuyet = lyThuyet * 15; // 1 tín chỉ lý thuyết = 15 tiết
-            const tietThucHanh = thucHanh * 30; // 1 tín chỉ thực hành = 30 tiết
+            // Tính tổng số tín chỉ và tự học
+            const totalCredits = theoryCredits + practiceCredits;
+            totalCreditsSpan.textContent = totalCredits;
+            const selfStudyPeriods = totalCredits * 30; // Tổng số tín chỉ × 30 tiết
+            selfStudyPeriodsSpan.textContent = Math.round(selfStudyPeriods);
 
-            // Phân bổ giờ giảng dạy (ví dụ: chia đều cho các loại hình)
-            const ttDongBo = Math.round(tietLyThuyet * 0.4); // 40% lý thuyết
-            const ttKhongDongBo = Math.round(tietLyThuyet * 0.3); // 30% lý thuyết
-            const lms = Math.round(tietLyThuyet * 0.2); // 20% lý thuyết
-            const thuTin = Math.round(tietLyThuyet * 0.1); // 10% lý thuyết
-            const tongGiangDay = ttDongBo + ttKhongDongBo + lms + thuTin;
+            // Gợi ý phân bổ ban đầu
+            const suggestedTheorySync = theoryCredits * 7.5; // 15 tiết/tín chỉ chia đều
+            const suggestedTheoryAsync = theoryCredits * 7.5;
+            const suggestedPracticeSync = practiceCredits * 15; // 30 tiết/tín chỉ chia đều
+            const suggestedPracticeAsync = practiceCredits * 15;
+            const suggestedSelfStudyResearch = selfStudyPeriods; // Tự học mặc định vào Tự học, tự nghiên cứu
+
+            // Điền giá trị mặc định nếu ô input chưa được chỉnh sửa
+            if (!tableInputs.theorySync.dataset.edited) tableInputs.theorySync.value = Math.round(suggestedTheorySync);
+            if (!tableInputs.practiceSync.dataset.edited) tableInputs.practiceSync.value = Math.round(suggestedPracticeSync);
+            if (!tableInputs.selfStudySync.dataset.edited) tableInputs.selfStudySync.value = 0;
+            if (!tableInputs.theoryAsync.dataset.edited) tableInputs.theoryAsync.value = Math.round(suggestedTheoryAsync);
+            if (!tableInputs.practiceAsync.dataset.edited) tableInputs.practiceAsync.value = Math.round(suggestedPracticeAsync);
+            if (!tableInputs.selfStudyAsync.dataset.edited) tableInputs.selfStudyAsync.value = 0;
+            if (!tableInputs.theoryLms.dataset.edited) tableInputs.theoryLms.value = 0;
+            if (!tableInputs.practiceLms.dataset.edited) tableInputs.practiceLms.value = 0;
+            if (!tableInputs.selfStudyLms.dataset.edited) tableInputs.selfStudyLms.value = 0;
+            if (!tableInputs.theoryCorrespondence.dataset.edited) tableInputs.theoryCorrespondence.value = 0;
+            if (!tableInputs.practiceCorrespondence.dataset.edited) tableInputs.practiceCorrespondence.value = 0;
+            if (!tableInputs.selfStudyCorrespondence.dataset.edited) tableInputs.selfStudyCorrespondence.value = 0;
+            if (!tableInputs.theorySelfStudy.dataset.edited) tableInputs.theorySelfStudy.value = 0;
+            if (!tableInputs.practiceSelfStudy.dataset.edited) tableInputs.practiceSelfStudy.value = 0;
+            if (!tableInputs.selfStudyResearch.dataset.edited) tableInputs.selfStudyResearch.value = Math.round(suggestedSelfStudyResearch);
+            if (!tableInputs.theoryAssessment.dataset.edited) tableInputs.theoryAssessment.value = 0;
+            if (!tableInputs.practiceAssessment.dataset.edited) tableInputs.practiceAssessment.value = 0;
+            if (!tableInputs.selfStudyAssessment.dataset.edited) tableInputs.selfStudyAssessment.value = 0;
+
+            // Lấy giá trị từ các ô input
+            const theorySync = parseFloat(tableInputs.theorySync.value) || 0;
+            const practiceSync = parseFloat(tableInputs.practiceSync.value) || 0;
+            const selfStudySync = parseFloat(tableInputs.selfStudySync.value) || 0;
+            const theoryAsync = parseFloat(tableInputs.theoryAsync.value) || 0;
+            const practiceAsync = parseFloat(tableInputs.practiceAsync.value) || 0;
+            const selfStudyAsync = parseFloat(tableInputs.selfStudyAsync.value) || 0;
+            const theoryLms = parseFloat(tableInputs.theoryLms.value) || 0;
+            const practiceLms = parseFloat(tableInputs.practiceLms.value) || 0;
+            const selfStudyLms = parseFloat(tableInputs.selfStudyLms.value) || 0;
+            const theoryCorrespondence = parseFloat(tableInputs.theoryCorrespondence.value) || 0;
+            const practiceCorrespondence = parseFloat(tableInputs.practiceCorrespondence.value) || 0;
+            const selfStudyCorrespondence = parseFloat(tableInputs.selfStudyCorrespondence.value) || 0;
+            const theorySelfStudy = parseFloat(tableInputs.theorySelfStudy.value) || 0;
+            const practiceSelfStudy = parseFloat(tableInputs.practiceSelfStudy.value) || 0;
+            const selfStudyResearch = parseFloat(tableInputs.selfStudyResearch.value) || 0;
+            const theoryAssessment = parseFloat(tableInputs.theoryAssessment.value) || 0;
+            const practiceAssessment = parseFloat(tableInputs.practiceAssessment.value) || 0;
+            const selfStudyAssessment = parseFloat(tableInputs.selfStudyAssessment.value) || 0;
+
+            // Tính tổng số tiết cho mỗi hàng
+            const totalSyncPeriods = theorySync + practiceSync + selfStudySync;
+            const totalAsyncPeriods = theoryAsync + practiceAsync + selfStudyAsync;
+            const totalLmsPeriods = theoryLms + practiceLms + selfStudyLms;
+            const totalCorrespondencePeriods = theoryCorrespondence + practiceCorrespondence + selfStudyCorrespondence;
+            const totalSelfStudyPeriods = theorySelfStudy + practiceSelfStudy + selfStudyResearch;
+            const totalAssessmentPeriods = theoryAssessment + practiceAssessment + selfStudyAssessment;
+
+            // Quy đổi tiết sang giờ (1 tiết = 50 phút)
+            const totalSyncHours = (totalSyncPeriods * 50) / 60;
+            const totalAsyncHours = (totalAsyncPeriods * 50) / 60;
+            const totalLmsHours = (totalLmsPeriods * 50) / 60;
+            const totalCorrespondenceHours = (totalCorrespondencePeriods * 50) / 60;
+            const totalSelfStudyHours = (totalSelfStudyPeriods * 50) / 60;
+            const totalAssessmentHours = (totalAssessmentPeriods * 50) / 60;
+
+            // Tính tổng số tiết cho mỗi cột
+            const totalTheoryTeaching = theorySync + theoryAsync + theoryLms + theoryCorrespondence;
+            const totalPracticeTeaching = practiceSync + practiceAsync + practiceLms + practiceCorrespondence;
+            const totalSelfStudyTeaching = selfStudySync + selfStudyAsync + selfStudyLms + selfStudyCorrespondence;
+            const totalTheoryOther = theorySelfStudy + theoryAssessment;
+            const totalPracticeOther = practiceSelfStudy + practiceAssessment;
+            const totalSelfStudyOther = selfStudyResearch + selfStudyAssessment;
+
+            // Tính tổng giờ
+            const totalTeachingHours = totalSyncHours + totalAsyncHours + totalLmsHours + totalCorrespondenceHours;
+            const totalOtherHours = totalSelfStudyHours + totalAssessmentHours;
+            const totalHours = totalTeachingHours + totalOtherHours;
+
+            // Tính số giờ yêu cầu (50 giờ/tín chỉ)
+            const requiredHours = totalCredits * 50;
+            const hoursNeeded = requiredHours - totalHours;
 
             // Cập nhật bảng
-            document.getElementById('ttDongBo').textContent = ttDongBo;
-            document.getElementById('ttKhongDongBo').textContent = ttKhongDongBo;
-            document.getElementById('lms').textContent = lms;
-            document.getElementById('thuTin').textContent = thuTin;
-            document.getElementById('tongGiangDay').textContent = tongGiangDay;
-            document.getElementById('tongGiangDayGio').textContent = Math.round(tongGiangDay / 15); // Quy đổi sang giờ
+            tableCells.totalSync.textContent = Math.round(totalSyncHours);
+            tableCells.totalAsync.textContent = Math.round(totalAsyncHours);
+            tableCells.totalLms.textContent = Math.round(totalLmsHours);
+            tableCells.totalCorrespondence.textContent = Math.round(totalCorrespondenceHours);
+            tableCells.totalSelfStudy.textContent = Math.round(totalSelfStudyHours);
+            tableCells.totalAssessment.textContent = Math.round(totalAssessmentHours);
+            tableCells.totalTheoryTeaching.textContent = Math.round(totalTheoryTeaching);
+            tableCells.totalPracticeTeaching.textContent = Math.round(totalPracticeTeaching);
+            tableCells.totalSelfStudyTeaching.textContent = Math.round(totalSelfStudyTeaching);
+            tableCells.totalTeachingHours.textContent = Math.round(totalTeachingHours);
+            tableCells.totalTheoryOther.textContent = Math.round(totalTheoryOther);
+            tableCells.totalPracticeOther.textContent = Math.round(totalPracticeOther);
+            tableCells.totalSelfStudyOther.textContent = Math.round(totalSelfStudyOther);
+            tableCells.totalOtherHours.textContent = Math.round(totalOtherHours);
+            tableCells.totalTheory.textContent = Math.round(totalTheoryTeaching + totalTheoryOther);
+            tableCells.totalPractice.textContent = Math.round(totalPracticeTeaching + totalPracticeOther);
+            tableCells.totalSelfStudy.textContent = Math.round(totalSelfStudyTeaching + totalSelfStudyOther);
+            tableCells.totalHours.textContent = Math.round(totalHours);
 
-            // Phân bổ tự học
-            const tuHocNghienCuu = Math.round(tuHoc * 0.8); // 80% tự học
-            const onThi = Math.round(tuHoc * 0.2); // 20% ôn thi
-            const tongTuHoc = tuHocNghienCuu + onThi;
+            // Kiểm tra lỗi
+            errorMessage.style.display = 'none';
+            suggestionMessage.style.display = 'none';
+            errorMessage.classList.remove('success');
+            if (totalCredits === 0) {
+                errorMessage.textContent = 'Lỗi: Vui lòng nhập số tín chỉ lớn hơn 0!';
+                errorMessage.style.display = 'block';
+            } else if (Math.abs(hoursNeeded) > 0.5) { // Chênh lệch lớn hơn 0.5 giờ
+                errorMessage.textContent = 'Lỗi: Tổng số giờ phân bổ không khớp với yêu cầu!';
+                errorMessage.style.display = 'block';
+                if (hoursNeeded > 0) {
+                    suggestionMessage.textContent = `Gợi ý: Cần thêm ${Math.round(hoursNeeded)} giờ để đạt tổng ${Math.round(requiredHours)} giờ học tập.`;
+                } else {
+                    suggestionMessage.textContent = `Gợi ý: Phân bổ vượt ${Math.round(-hoursNeeded)} giờ so với tổng ${Math.round(requiredHours)} giờ học tập.`;
+                }
+                suggestionMessage.style.display = 'block';
+            } else {
+                errorMessage.textContent = 'Phân bổ giờ học tập đã khớp!';
+                errorMessage.classList.add('success');
+                errorMessage.style.display = 'block';
+            }
 
-            document.getElementById('tuHocNghienCuu').textContent = tuHocNghienCuu;
-            document.getElementById('onThi').textContent = onThi;
-            document.getElementById('tongTuHoc').textContent = tongTuHoc;
-            document.getElementById('tongTuHocGio').textContent = Math.round(tongTuHoc / 15);
-
-            // Tổng cộng
-            document.getElementById('tongLyThuyet').textContent = tongGiangDay;
-            document.getElementById('tongThucHanh').textContent = tietThucHanh;
-            document.getElementById('tongTuHocNghienCuu').textContent = tongTuHoc;
-            document.getElementById('tongGio').textContent = Math.round((tongGiangDay + tietThucHanh + tongTuHoc) / 15);
+            // Cập nhật thông báo gợi ý
+            hoursRequiredSpan.textContent = Math.round(requiredHours);
+            hoursNeededSpan.textContent = Math.abs(Math.round(hoursNeeded));
         }
 
-        function downloadWord() {
-            alert('Chức năng tải file Word chưa được triển khai!');
+        // Gắn sự kiện input và đánh dấu ô đã chỉnh sửa
+        function markAsEdited(event) {
+            event.target.dataset.edited = 'true';
         }
 
-        function downloadHTML() {
-            const content = document.documentElement.outerHTML;
-            const blob = new Blob([content], { type: 'text/html' });
+        theoryCreditsInput.addEventListener('input', () => {
+            Object.values(tableInputs).forEach(input => delete input.dataset.edited); // Reset edited state
+            updateAllocation();
+        });
+        practiceCreditsInput.addEventListener('input', () => {
+            Object.values(tableInputs).forEach(input => delete input.dataset.edited); // Reset edited state
+            updateAllocation();
+        });
+        Object.values(tableInputs).forEach(input => {
+            input.addEventListener('input', markAsEdited);
+            input.addEventListener('input', updateAllocation);
+        });
+
+        // Hàm xuất ra file Word
+        function exportToWord() {
+            const theoryCredits = parseFloat(theoryCreditsInput.value) || 0;
+            const practiceCredits = parseFloat(practiceCreditsInput.value) || 0;
+            const totalCredits = theoryCredits + practiceCredits;
+            
+            // Tạo nội dung HTML cho Word document
+            const wordContent = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word" 
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="utf-8">
+                    <title>Phân bổ các loại giờ</title>
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>90</w:Zoom>
+                            <w:DoNotPromptForConvert/>
+                            <w:DoNotShowInsertionsAndDeletions/>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        body { font-family: 'Times New Roman', serif; font-size: 12pt; }
+                        h1 { text-align: center; font-size: 16pt; font-weight: bold; }
+                        h2 { font-size: 14pt; font-weight: bold; margin-top: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+                        th, td { border: 1px solid black; padding: 8px; text-align: center; }
+                        th { background-color: #f2f2f2; font-weight: bold; }
+                        .info-section { margin: 20px 0; }
+                        .info-item { margin: 5px 0; }
+                    </style>
+                </head>
+                <body>
+                    <h1>PHÂN BỔ CÁC LOẠI GIỜ<br/>(Dành cho hệ Đào tạo từ xa)</h1>
+                    
+                    <div class="info-section">
+                        <h2>Thông tin học phần</h2>
+                        <div class="info-item"><strong>Số tín chỉ lý thuyết:</strong> ${theoryCredits}</div>
+                        <div class="info-item"><strong>Số tín chỉ thực hành:</strong> ${practiceCredits}</div>
+                        <div class="info-item"><strong>Tổng số tín chỉ:</strong> ${totalCredits}</div>
+                        <div class="info-item"><strong>Tự học (tiết):</strong> ${Math.round(totalCredits * 30)}</div>
+                    </div>
+
+                    <h2>Phân bổ cụ thể</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Phân bổ các loại giờ</th>
+                                <th>Lý thuyết (tiết)</th>
+                                <th>Thực hành (tiết)</th>
+                                <th>Tự học, tự nghiên cứu (tiết)</th>
+                                <th>Tổng (giờ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5"><strong>Số giờ giảng dạy, học tập</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Trực tuyến đồng bộ</td>
+                                <td>${tableInputs.theorySync.value}</td>
+                                <td>${tableInputs.practiceSync.value}</td>
+                                <td>${tableInputs.selfStudySync.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td>Trực tuyến không đồng bộ</td>
+                                <td>${tableInputs.theoryAsync.value}</td>
+                                <td>${tableInputs.practiceAsync.value}</td>
+                                <td>${tableInputs.selfStudyAsync.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td>LMS (có hướng dẫn)</td>
+                                <td>${tableInputs.theoryLms.value}</td>
+                                <td>${tableInputs.practiceLms.value}</td>
+                                <td>${tableInputs.selfStudyLms.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td>Thư tín, học liệu (nếu có)</td>
+                                <td>${tableInputs.theoryCorrespondence.value}</td>
+                                <td>${tableInputs.practiceCorrespondence.value}</td>
+                                <td>${tableInputs.selfStudyCorrespondence.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tổng Số giờ giảng dạy, học tập</strong></td>
+                                <td><strong>${Math.round(
+                                    parseFloat(tableInputs.theorySync.value) + 
+                                    parseFloat(tableInputs.theoryAsync.value) + 
+                                    parseFloat(tableInputs.theoryLms.value) + 
+                                    parseFloat(tableInputs.theoryCorrespondence.value)
+                                )}</strong></td>
+                                <td><strong>${Math.round(
+                                    parseFloat(tableInputs.practiceSync.value) + 
+                                    parseFloat(tableInputs.practiceAsync.value) + 
+                                    parseFloat(tableInputs.practiceLms.value) + 
+                                    parseFloat(tableInputs.practiceCorrespondence.value)
+                                )}</strong></td>
+                                <td><strong>${Math.round(
+                                    parseFloat(tableInputs.selfStudySync.value) + 
+                                    parseFloat(tableInputs.selfStudyAsync.value) + 
+                                    parseFloat(tableInputs.selfStudyLms.value) + 
+                                    parseFloat(tableInputs.selfStudyCorrespondence.value)
+                                )}</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
+                                        parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
+                                        parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
+                                        parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value)
+                                    ) * 50 / 60
+                                    )
+                                }</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5"><strong>Số giờ tự học và khác</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Tự học, tự nghiên cứu</td>
+                                <td>${tableInputs.theorySelfStudy.value}</td>
+                                <td>${tableInputs.practiceSelfStudy.value}</td>
+                                <td>${tableInputs.selfStudyResearch.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td>Ôn thi, dự thi, kiểm tra</td>
+                                <td>${tableInputs.theoryAssessment.value}</td>
+                                <td>${tableInputs.practiceAssessment.value}</td>
+                                <td>${tableInputs.selfStudyAssessment.value}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)) * 50 / 60)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tổng Số giờ tự học và khác</strong></td>
+                                <td><strong>${Math.round(parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.theoryAssessment.value))}</strong></td>
+                                <td><strong>${Math.round(parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.practiceAssessment.value))}</strong></td>
+                                <td><strong>${Math.round(parseFloat(tableInputs.selfStudyResearch.value) + parseFloat(tableInputs.selfStudyAssessment.value))}</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
+                                        parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                    ) * 50 / 60
+                                    )
+                                }</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>TỔNG</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.theoryCorrespondence.value) +
+                                        parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.theoryAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.practiceCorrespondence.value) +
+                                        parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.practiceAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.selfStudySync.value) + parseFloat(tableInputs.selfStudyAsync.value) + parseFloat(tableInputs.selfStudyLms.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
+                                        parseFloat(tableInputs.selfStudyResearch.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (
+                                            parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
+                                            parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
+                                            parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
+                                            parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
+                                            parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
+                                            parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                        ) * 50 / 60
+                                    )
+                                }</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="info-section">
+                        <p><strong>Ghi chú:</strong></p>
+                        <ul>
+                            <li>1 tiết = 50 phút</li>
+                            <li>Tổng số giờ yêu cầu: ${Math.round(totalCredits * 50)} giờ</li>
+                            <li>Ngày tạo: ${new Date().toLocaleDateString('vi-VN')}</li>
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            // Tạo Blob và tải xuống
+            const blob = new Blob(['\ufeff', wordContent], {
+                type: 'application/msword'
+            });
+            
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'phan_bo_gio.html';
-            a.click();
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Phan_bo_gio_hoc_${totalCredits}tc_${new Date().getTime()}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            
+            alert('File Word đã được tạo và tải xuống!');
         }
 
-        function printTable() {
-            window.print();
-        }
+        // Chạy lần đầu để hiển thị giá trị mặc định
+        updateAllocation();
     </script>
 </body>
 </html>
