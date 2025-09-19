@@ -92,7 +92,7 @@
         <p><strong>Tổng số tín chỉ:</strong> <span id="total-credits">0</span></p>
         <p><strong>Tự học (tiết):</strong> <span id="self-study-periods">0</span></p>
         <p id="error-message" class="error" style="display: none;">Lỗi: Tổng tín chỉ không khớp!</p>
-        <p id="suggestion-message" class="suggestion" style="display: none;">Gợi ý: Cần thêm <span id="hours-needed">0</span> tiết để đạt tổng <span id="hours-required">0</span> tiết học tập.</p>
+        <p id="suggestion-message" class="suggestion" style="display: none;">Gợi ý: Cần thêm <span id="hours-needed">0</span> giờ để đạt tổng <span id="hours-required">0</span> giờ học tập.</p>
     </div>
     <div class="section">
         <h2>Phân bổ cụ thể</h2>
@@ -103,7 +103,7 @@
                     <th>Lý thuyết (tiết)</th>
                     <th>Thực hành (tiết)</th>
                     <th>Tự học, tự nghiên cứu (tiết)</th>
-                    <th>Tổng (tiết)</th>
+                    <th>Tổng (giờ)</th>
                 </tr>
             </thead>
             <tbody>
@@ -293,6 +293,16 @@
             const totalCorrespondencePeriods = theoryCorrespondence + practiceCorrespondence + selfStudyCorrespondence;
             const totalSelfStudyPeriods = theorySelfStudy + practiceSelfStudy + selfStudyResearch;
             const totalAssessmentPeriods = theoryAssessment + practiceAssessment + selfStudyAssessment;
+            // Quy đổi tiết sang giờ (1 tiết = 50 phút)
+            const totalSyncHours = (totalSyncPeriods * 50) / 60;
+            const totalAsyncHours = (totalAsyncPeriods * 50) / 60;
+            const totalLmsHours = (totalLmsPeriods * 50) / 60;
+            const totalCorrespondenceHours = (totalCorrespondencePeriods * 50) / 60;
+            const totalSelfStudyHours = (totalSelfStudyPeriods * 50) / 60;
+            const totalAssessmentHours = (totalAssessmentPeriods * 50) / 60;
+            // In giá trị để kiểm tra lỗi
+            console.log('Tự học, tự nghiên cứu - Tổng tiết:', totalSelfStudyPeriods);
+            console.log('Tự học, tự nghiên cứu - Tổng giờ:', totalSelfStudyHours);
             // Tính tổng số tiết cho mỗi cột
             const totalTheoryTeaching = theorySync + theoryAsync + theoryLms + theoryCorrespondence;
             const totalPracticeTeaching = practiceSync + practiceAsync + practiceLms + practiceCorrespondence;
@@ -300,32 +310,32 @@
             const totalTheoryOther = theorySelfStudy + theoryAssessment;
             const totalPracticeOther = practiceSelfStudy + practiceAssessment;
             const totalSelfStudyOther = selfStudyResearch + selfStudyAssessment;
-            // Tính tổng tiết
-            const totalTeachingPeriods = totalSyncPeriods + totalAsyncPeriods + totalLmsPeriods + totalCorrespondencePeriods;
-            const totalOtherPeriods = totalSelfStudyPeriods + totalAssessmentPeriods;
-            const totalPeriods = totalTeachingPeriods + totalOtherPeriods;
-            // Tính số tiết yêu cầu (50 tiết/tín chỉ)
-            const requiredPeriods = totalCredits * 50;
-            const periodsNeeded = requiredPeriods - totalPeriods;
+            // Tính tổng giờ
+            const totalTeachingHours = totalSyncHours + totalAsyncHours + totalLmsHours + totalCorrespondenceHours;
+            const totalOtherHours = totalSelfStudyHours + totalAssessmentHours;
+            const totalHours = totalTeachingHours + totalOtherHours;
+            // Tính số giờ yêu cầu (50 giờ/tín chỉ)
+            const requiredHours = totalCredits * 50;
+            const hoursNeeded = requiredHours - totalHours;
             // Cập nhật bảng
-            tableCells.totalSync.textContent = Math.round(totalSyncPeriods);
-            tableCells.totalAsync.textContent = Math.round(totalAsyncPeriods);
-            tableCells.totalLms.textContent = Math.round(totalLmsPeriods);
-            tableCells.totalCorrespondence.textContent = Math.round(totalCorrespondencePeriods);
-            tableCells.totalSelfStudy.textContent = Math.round(totalSelfStudyPeriods);
-            tableCells.totalAssessment.textContent = Math.round(totalAssessmentPeriods);
+            tableCells.totalSync.textContent = Math.round(totalSyncHours);
+            tableCells.totalAsync.textContent = Math.round(totalAsyncHours);
+            tableCells.totalLms.textContent = Math.round(totalLmsHours);
+            tableCells.totalCorrespondence.textContent = Math.round(totalCorrespondenceHours);
+            tableCells.totalSelfStudy.textContent = Math.round(totalSelfStudyHours);
+            tableCells.totalAssessment.textContent = Math.round(totalAssessmentHours);
             tableCells.totalTheoryTeaching.textContent = Math.round(totalTheoryTeaching);
             tableCells.totalPracticeTeaching.textContent = Math.round(totalPracticeTeaching);
             tableCells.totalSelfStudyTeaching.textContent = Math.round(totalSelfStudyTeaching);
-            tableCells.totalTeachingHours.textContent = Math.round(totalTeachingPeriods);
+            tableCells.totalTeachingHours.textContent = Math.round(totalTeachingHours);
             tableCells.totalTheoryOther.textContent = Math.round(totalTheoryOther);
             tableCells.totalPracticeOther.textContent = Math.round(totalPracticeOther);
             tableCells.totalSelfStudyOther.textContent = Math.round(totalSelfStudyOther);
-            tableCells.totalOtherHours.textContent = Math.round(totalOtherPeriods);
+            tableCells.totalOtherHours.textContent = Math.round(totalOtherHours);
             tableCells.totalTheory.textContent = Math.round(totalTheoryTeaching + totalTheoryOther);
             tableCells.totalPractice.textContent = Math.round(totalPracticeTeaching + totalPracticeOther);
             tableCells.totalSelfStudyAll.textContent = Math.round(totalSelfStudyTeaching + totalSelfStudyOther);
-            tableCells.totalHours.textContent = Math.round(totalPeriods);
+            tableCells.totalHours.textContent = Math.round(totalHours);
             // Kiểm tra lỗi
             errorMessage.style.display = 'none';
             suggestionMessage.style.display = 'none';
@@ -333,23 +343,23 @@
             if (totalCredits === 0) {
                 errorMessage.textContent = 'Lỗi: Vui lòng nhập số tín chỉ lớn hơn 0!';
                 errorMessage.style.display = 'block';
-            } else if (Math.abs(periodsNeeded) > 0) { // Chênh lệch lớn hơn 0 tiết
-                errorMessage.textContent = 'Lỗi: Tổng số tiết phân bổ không khớp với yêu cầu!';
+            } else if (Math.abs(hoursNeeded) > 0.5) { // Chênh lệch lớn hơn 0.5 giờ
+                errorMessage.textContent = 'Lỗi: Tổng số giờ phân bổ không khớp với yêu cầu!';
                 errorMessage.style.display = 'block';
-                if (periodsNeeded > 0) {
-                    suggestionMessage.textContent = `Gợi ý: Cần thêm ${Math.round(periodsNeeded)} tiết để đạt tổng ${Math.round(requiredPeriods)} tiết học tập.`;
+                if (hoursNeeded > 0) {
+                    suggestionMessage.textContent = `Gợi ý: Cần thêm ${Math.round(hoursNeeded)} giờ để đạt tổng ${Math.round(requiredHours)} giờ học tập.`;
                 } else {
-                    suggestionMessage.textContent = `Gợi ý: Phân bổ vượt ${Math.round(-periodsNeeded)} tiết so với tổng ${Math.round(requiredPeriods)} tiết học tập.`;
+                    suggestionMessage.textContent = `Gợi ý: Phân bổ vượt ${Math.round(-hoursNeeded)} giờ so với tổng ${Math.round(requiredHours)} giờ học tập.`;
                 }
                 suggestionMessage.style.display = 'block';
             } else {
-                errorMessage.textContent = 'Phân bổ tiết học tập đã khớp!';
+                errorMessage.textContent = 'Phân bổ giờ học tập đã khớp!';
                 errorMessage.classList.add('success');
                 errorMessage.style.display = 'block';
             }
             // Cập nhật thông báo gợi ý
-            hoursRequiredSpan.textContent = Math.round(requiredPeriods);
-            hoursNeededSpan.textContent = Math.abs(Math.round(periodsNeeded));
+            hoursRequiredSpan.textContent = Math.round(requiredHours);
+            hoursNeededSpan.textContent = Math.abs(Math.round(hoursNeeded));
         }
         // Gắn sự kiện input và đánh dấu ô đã chỉnh sửa
         function markAsEdited(event) {
@@ -372,6 +382,7 @@
             const theoryCredits = parseFloat(theoryCreditsInput.value) || 0;
             const practiceCredits = parseFloat(practiceCreditsInput.value) || 0;
             const totalCredits = theoryCredits + practiceCredits;
+           
             // Tạo nội dung HTML cho Word document
             const wordContent = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office"
@@ -403,6 +414,7 @@
                 </head>
                 <body>
                     <h1>PHÂN BỔ CÁC LOẠI GIỜ<br/>(Dành cho hệ Đào tạo từ xa)</h1>
+                   
                     <div class="info-section">
                         <h2>Thông tin học phần</h2>
                         <div class="info-item"><strong>Số tín chỉ lý thuyết:</strong> ${theoryCredits}</div>
@@ -418,7 +430,7 @@
                                 <th>Lý thuyết (tiết)</th>
                                 <th>Thực hành (tiết)</th>
                                 <th>Tự học, tự nghiên cứu (tiết)</th>
-                                <th>Tổng (tiết)</th>
+                                <th>Tổng (giờ)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -430,28 +442,28 @@
                                 <td>${tableInputs.theorySync.value}</td>
                                 <td>${tableInputs.practiceSync.value}</td>
                                 <td>${tableInputs.selfStudySync.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td>Trực tuyến không đồng bộ</td>
                                 <td>${tableInputs.theoryAsync.value}</td>
                                 <td>${tableInputs.practiceAsync.value}</td>
                                 <td>${tableInputs.selfStudyAsync.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td>LMS (có hướng dẫn)</td>
                                 <td>${tableInputs.theoryLms.value}</td>
                                 <td>${tableInputs.practiceLms.value}</td>
                                 <td>${tableInputs.selfStudyLms.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td>Thư tín, học liệu (nếu có)</td>
                                 <td>${tableInputs.theoryCorrespondence.value}</td>
                                 <td>${tableInputs.practiceCorrespondence.value}</td>
                                 <td>${tableInputs.selfStudyCorrespondence.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td><strong>Tổng Số giờ giảng dạy, học tập</strong></td>
@@ -473,12 +485,15 @@
                                     parseFloat(tableInputs.selfStudyLms.value) +
                                     parseFloat(tableInputs.selfStudyCorrespondence.value)
                                 )}</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
-                                    parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
-                                    parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
-                                    parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value)
-                                )}</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
+                                        parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
+                                        parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
+                                        parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value)
+                                    ) * 50 / 60
+                                    )
+                                }</strong></td>
                             </tr>
                             <tr>
                                 <td colspan="5"><strong>Số giờ tự học và khác</strong></td>
@@ -488,55 +503,69 @@
                                 <td>${tableInputs.theorySelfStudy.value}</td>
                                 <td>${tableInputs.practiceSelfStudy.value}</td>
                                 <td>${tableInputs.selfStudyResearch.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td>Ôn thi, dự thi, kiểm tra</td>
                                 <td>${tableInputs.theoryAssessment.value}</td>
                                 <td>${tableInputs.practiceAssessment.value}</td>
                                 <td>${tableInputs.selfStudyAssessment.value}</td>
-                                <td>${Math.round(parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value))}</td>
+                                <td>${Math.round((parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)) * 50 / 60)}</td>
                             </tr>
                             <tr>
                                 <td><strong>Tổng Số giờ tự học và khác</strong></td>
                                 <td><strong>${Math.round(parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.theoryAssessment.value))}</strong></td>
                                 <td><strong>${Math.round(parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.practiceAssessment.value))}</strong></td>
                                 <td><strong>${Math.round(parseFloat(tableInputs.selfStudyResearch.value) + parseFloat(tableInputs.selfStudyAssessment.value))}</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
-                                    parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
-                                )}</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
+                                        parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                    ) * 50 / 60
+                                    )
+                                }</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>TỔNG</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.theoryCorrespondence.value) +
-                                    parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.theoryAssessment.value)
-                                )}</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.practiceCorrespondence.value) +
-                                    parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.practiceAssessment.value)
-                                )}</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.selfStudySync.value) + parseFloat(tableInputs.selfStudyAsync.value) + parseFloat(tableInputs.selfStudyLms.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
-                                    parseFloat(tableInputs.selfStudyResearch.value) + parseFloat(tableInputs.selfStudyAssessment.value)
-                                )}</strong></td>
-                                <td><strong>${Math.round(
-                                    parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
-                                    parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
-                                    parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
-                                    parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
-                                    parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
-                                    parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
-                                )}</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.theoryCorrespondence.value) +
+                                        parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.theoryAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.practiceCorrespondence.value) +
+                                        parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.practiceAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        parseFloat(tableInputs.selfStudySync.value) + parseFloat(tableInputs.selfStudyAsync.value) + parseFloat(tableInputs.selfStudyLms.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
+                                        parseFloat(tableInputs.selfStudyResearch.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                    )
+                                }</strong></td>
+                                <td><strong>${
+                                    Math.round(
+                                        (
+                                            parseFloat(tableInputs.theorySync.value) + parseFloat(tableInputs.practiceSync.value) + parseFloat(tableInputs.selfStudySync.value) +
+                                            parseFloat(tableInputs.theoryAsync.value) + parseFloat(tableInputs.practiceAsync.value) + parseFloat(tableInputs.selfStudyAsync.value) +
+                                            parseFloat(tableInputs.theoryLms.value) + parseFloat(tableInputs.practiceLms.value) + parseFloat(tableInputs.selfStudyLms.value) +
+                                            parseFloat(tableInputs.theoryCorrespondence.value) + parseFloat(tableInputs.practiceCorrespondence.value) + parseFloat(tableInputs.selfStudyCorrespondence.value) +
+                                            parseFloat(tableInputs.theorySelfStudy.value) + parseFloat(tableInputs.practiceSelfStudy.value) + parseFloat(tableInputs.selfStudyResearch.value) +
+                                            parseFloat(tableInputs.theoryAssessment.value) + parseFloat(tableInputs.practiceAssessment.value) + parseFloat(tableInputs.selfStudyAssessment.value)
+                                        ) * 50 / 60
+                                    )
+                                }</strong></td>
                             </tr>
                         </tbody>
                     </table>
+                   
                     <div class="info-section">
                         <p><strong>Ghi chú:</strong></p>
                         <ul>
                             <li>1 tiết = 50 phút</li>
-                            <li>Tổng số tiết yêu cầu: ${Math.round(totalCredits * 50)} tiết</li>
+                            <li>Tổng số giờ yêu cầu: ${Math.round(totalCredits * 50)} giờ</li>
                             <li>Ngày tạo: ${new Date().toLocaleDateString('vi-VN')}</li>
                         </ul>
                     </div>
@@ -547,6 +576,7 @@
             const blob = new Blob(['\ufeff', wordContent], {
                 type: 'application/msword'
             });
+           
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -555,6 +585,7 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+           
             alert('File Word đã được tạo và tải xuống!');
         }
         // Chạy lần đầu để hiển thị giá trị mặc định
